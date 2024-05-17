@@ -213,7 +213,7 @@ def check_connection(host):
 
         return {"message": response}, 200
     except Exception as e:
-        return {"message": "Failed to connect"}, 200
+        return {"message": e}, 200
 
 
 @app.route("/upload_test", methods=["POST"])
