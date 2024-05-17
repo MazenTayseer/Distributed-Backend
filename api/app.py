@@ -9,7 +9,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "/tmp/uploads"
 
 MASTER_NODE_HOST = "master001"
 NODE001_NODE_HOST = "node001"
@@ -22,6 +22,8 @@ VMS = [MASTER_NODE_HOST, NODE001_NODE_HOST]
 
 REMOTE_PATH_TEST_CASES = "/home/mazen/gui/uploads"
 REMOTE_PATH = "/home/mazen/gui"
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 def upload_to_node(local_path, remote_path, host):
@@ -84,7 +86,7 @@ def get_images_and_preds(output):
 
     for image_name, pred, conf in predictions:
         image_predictions[image_name].append((pred, float(conf)))
-        
+
     machine_logs = [log.replace("node:", "") for log in machine_logs]
 
     return preimages, images, image_predictions, machine_logs
@@ -94,7 +96,7 @@ def get_images_and_preds(output):
 def upload_images():
     images = request.files.getlist("images")
     operations = request.form.getlist("operations")
-    
+
     if len(images) != len(operations):
         return jsonify({"error": "No images uploaded."}), 400
 
@@ -124,13 +126,13 @@ def upload_images():
 
     vms_response = process_images()
     output = vms_response["output"]
-    
+
     preimages, images, image_predictions, machine_logs = get_images_and_preds(output)
     error_logs = vms_response["error"].split("\n")
 
-    if len(error_logs) > 0 and not (len(error_logs) == 1 and error_logs[0] == ''):
+    if len(error_logs) > 0 and not (len(error_logs) == 1 and error_logs[0] == ""):
         machine_logs.extend(error_logs)
-            
+
     return (
         jsonify(
             {
@@ -179,7 +181,7 @@ def delete_files_from_nodes(host):
         stdin, stdout, stderr = ssh.exec_command(command_2)
         # Wait for the command to complete
         stdout.channel.recv_exit_status()
-        
+
         command_3 = "rm -rf /home/mazen/gui/results/*"
         stdin, stdout, stderr = ssh.exec_command(command_3)
         # Wait for the command to complete
@@ -232,7 +234,9 @@ def try_mpi():
         "master001", 22, "mazen", "MazenAzure2002", timeout=10
     )  # Adding timeout for connection attempt
 
-    stdin, stdout, stderr = ssh.exec_command('mpirun -np 2 -machinefile /home/mazen/gui/machinefile python3 /home/mazen/gui/run.py')
+    stdin, stdout, stderr = ssh.exec_command(
+        "mpirun -np 2 -machinefile /home/mazen/gui/machinefile python3 /home/mazen/gui/run.py"
+    )
 
     response = stdout.read().decode().strip()
 
