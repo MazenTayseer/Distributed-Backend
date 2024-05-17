@@ -1,5 +1,14 @@
 {
-    "engines": {
-      "node": "18.x"
-    }
-  }
+  "name": "my-flask-app",
+  "version": "1.0.0",
+  "description": "A Flask application deployed on Vercel",
+  "main": "wsgi.py",
+  "scripts": {
+    "start": "gunicorn --bind 0.0.0.0:$PORT wsgi:app"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
