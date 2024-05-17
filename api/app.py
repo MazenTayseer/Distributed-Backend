@@ -23,9 +23,6 @@ VMS = [MASTER_NODE_HOST, NODE001_NODE_HOST]
 REMOTE_PATH_TEST_CASES = "/home/mazen/gui/uploads"
 REMOTE_PATH = "/home/mazen/gui"
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
 
 def upload_to_node(local_path, remote_path, host):
     ssh = paramiko.SSHClient()
